@@ -17,7 +17,6 @@
 <script setup lang="ts">
 import { VueElement, ref, onMounted } from 'vue'
 
-
 const textarea = ref('')
 const background = ref('')
 const foreground = ref('')
@@ -44,6 +43,7 @@ const onkeydown = (e: KeyboardEvent) => {
   min-height: 300px;
   max-height: 1000px;
   overflow-y: auto;
+  border: 1px solid white;
 }
 
 .input-area {
