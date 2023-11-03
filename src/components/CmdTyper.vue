@@ -3,14 +3,17 @@
 		<div class="outputs">
 			{{ textarea }}
 			<div v-for="row in rows" :key="row.idx" class="cursored">
+				<span class="cursor">❯</span>
 				<input type="text" :value="row.data" readonly />
 			</div>
 		</div>
 		<div class="input-area">
 			<div class="background main-cursor">
+				<span class="cursor">gitorial.com@~/ ❯</span>
 				<input type="text" v-model="background" />
 			</div>
 			<div class="foreground main-cursor">
+				<span class="cursor">gitorial.com@~/ ❯</span>
 				<input type="text" v-model="foreground" ref="input" @input="onInput" @keydown="onkeydown" />
 			</div>
 		</div>
@@ -78,36 +81,20 @@ const onkeydown = async (e: KeyboardEvent) => {
 }
 
 input {
+	width: auto;
 	border: none;
 	border-width: 0px;
 	box-shadow: none;
 	margin-bottom: 0;
 	--line-height: 0;
+	padding-left: 0.5rem;
 }
 
 .cursored {
 	position: relative;
 }
 
-.cursored::before {
-	content: '❯ ';
-	position: absolute;
-	left: 8px;
-	font-weight: 900;
-}
-
-.cursored input {
-	padding-left: 30px;
-}
-
-.main-cursor::before {
-	content: 'gitorial.com@~/ ❯ ';
-	position: absolute;
-	left: 8px;
-	font-weight: 900;
-}
-
-.main-cursor input {
-	padding-left: 180px;
+.cursor {
+	padding-left: 0.5rem;
 }
 </style>
