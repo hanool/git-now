@@ -1,82 +1,113 @@
 <template>
-  <div class="cmd-typer">
-    <div class="outputs">
-        {{ textarea }}
-    </div>
-    <div class="input-area">
-      <div class="background">
-        <input type="text" v-model="background" />
-      </div>
-      <div class="foreground">
-        <input type="text" v-model="foreground" ref="input" @input="onInput" @keydown="onkeydown"/>
-      </div>
-    </div>
-  </div>
+	<div class="cmd-typer" ref="main">
+		<div class="outputs">
+			{{ textarea }}
+			<div v-for="row in rows" :key="row.idx" class="cursored">
+				<input type="text" :value="row.data" readonly />
+			</div>
+		</div>
+		<div class="input-area">
+			<div class="background main-cursor">
+				<input type="text" v-model="background" />
+			</div>
+			<div class="foreground main-cursor">
+				<input type="text" v-model="foreground" ref="input" @input="onInput" @keydown="onkeydown" />
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-import { VueElement, ref, onMounted } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 
 const textarea = ref('')
 const background = ref('')
 const foreground = ref('')
-const input = ref(null)
+const rows = ref<{ idx: number, data: string }[]>([])
+const input = ref<HTMLInputElement>()
+const main = ref<HTMLDivElement>()
 
 onMounted(() => {
-  input.value.focus();
+	if (input.value) {
+		input.value.focus();
+	}
 })
 
 const onInput = () => {
-  background.value = foreground.value ? foreground.value + ' + some' : ''
+	background.value = foreground.value ? foreground.value + ' + some' : ''
 }
 
-const onkeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter') {
-    textarea.value += '\r\n ❯ ' + foreground.value;
-    foreground.value = ''
-  }
+const onkeydown = async (e: KeyboardEvent) => {
+	if (e.key === 'Enter') {
+		if (foreground.value === "clear") {
+			rows.value = [];
+		} else {
+			rows.value.push({
+				idx: rows.value.length,
+				data: foreground.value,
+			})
+		}
+		foreground.value = ''
+
+		await nextTick();
+		main.value?.scroll({ top: main.value.clientHeight + (input.value?.clientHeight || 0) })
+		onInput();
+	}
 }
 </script>
 
 <style scoped>
 .cmd-typer {
-  min-height: 300px;
-  max-height: 1000px;
-  overflow-y: auto;
-  border: 1px solid white;
+	min-height: 300px;
+	max-height: 300px;
+	overflow-y: auto;
+	border: 1px solid white;
 }
 
 .input-area {
-  width: 100%;
-  position: relative;
-}
-
-.outputs {
-  white-space: pre-line;
-  margin-left: 9px;
-  empty-cells: show;
+	width: 100%;
+	position: relative;
 }
 
 .background,
 .foreground {
-  position: absolute;
-  left: 0px;
-  top: 0;
-  opacity: 70%;
+	position: absolute;
+	left: 0px;
+	top: 0;
+	opacity: 70%;
 }
 
 input {
-  padding-left: 30px;
-  border: none;
-  border-width: 0px;
-  box-shadow: none;
+	border: none;
+	border-width: 0px;
+	box-shadow: none;
+	margin-bottom: 0;
+	--line-height: 0;
 }
 
-.foreground::before {
-  content: '❯ ';
-  position: absolute;
-  left: 8px;
-  top: calc(0.25rem * var(--line-height) + var(--form-element-spacing-vertical) / 2 + var(--border-width) / 2);
-  font-weight: 900;
+.cursored {
+	position: relative;
+}
+
+.cursored::before {
+	content: '❯ ';
+	position: absolute;
+	left: 8px;
+	font-weight: 900;
+}
+
+.cursored input {
+	padding-left: 30px;
+}
+
+.main-cursor::before {
+	content: 'gitorial.com@~/ ❯ ';
+	position: absolute;
+	left: 8px;
+	font-weight: 900;
+}
+
+.main-cursor input {
+	padding-left: 180px;
 }
 </style>
