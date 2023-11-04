@@ -22,7 +22,9 @@
 
 <script setup lang="ts">
 import { ref, nextTick, onMounted } from 'vue'
+import useCommander from '@/composables/useCommander'
 
+const { processCommand } = useCommander();
 const textarea = ref('')
 const background = ref('')
 const foreground = ref('')
@@ -42,13 +44,10 @@ const onInput = () => {
 
 const onkeydown = async (e: KeyboardEvent) => {
 	if (e.key === 'Enter') {
-		if (foreground.value === "clear") {
-			rows.value = [];
-		} else {
-			rows.value.push({
-				idx: rows.value.length,
-				data: foreground.value,
-			})
+		const result = processCommand(foreground.value)
+				?.process(rows.value);
+		if (result) {
+			rows.value = result;
 		}
 		foreground.value = ''
 
