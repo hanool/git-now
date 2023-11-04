@@ -1,3 +1,5 @@
+/// <reference types="./commander.d.ts" />
+
 export default () => {
     return {
         processCommand,
@@ -25,8 +27,3 @@ const processCommand = (command: string): Action => {
         }
     }
 }
-
-type Action = {
-    name: string,
-    process: (outputs: { idx: number, data: string }[]) => { idx: number, data: string }[],
-} | null;
