@@ -1,5 +1,5 @@
 /// <reference types="./commander.d.ts" />
-import { main } from './useGit'
+import { status } from '@/composables/useGit'
 
 export default () => {
 	return {
@@ -7,7 +7,7 @@ export default () => {
 	}
 }
 
-const processCommand = (command: string): Action => {
+const processCommand = async (command: string): Promise<Action> => {
 	if (command === 'clear') {
 		return {
 			name: "clear",
@@ -15,8 +15,22 @@ const processCommand = (command: string): Action => {
 				return [];
 			}
 		}
+	} else if (command === 'git status') {
+		const gitStatus = await status()
+		return {
+			name: 'git status',
+			process: (outputs) => {
+				gitStatus.forEach(fileStatus => {
+					outputs.push({
+						idx: outputs.length,
+						data: fileStatus
+					})
+				})
+				return outputs
+			}
+		}
+
 	} else {
-		main()
 		return {
 			name: "push",
 			process: (outputs) => {

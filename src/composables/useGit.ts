@@ -1,15 +1,26 @@
 import git from 'isomorphic-git'
 import { memfs } from 'memfs'
 
-export const main = async () => {
-	const { fs, vol } = memfs();
+const { fs } = memfs();
 
+export const initStage = async () => {
 	fs.mkdirSync('/repo')
-	console.log('new folder: ', vol.toJSON())
-
 	await git.init({ fs, dir: '/repo' })
-	console.log('git init: ', vol.toJSON())
+	fs.writeFileSync('/repo/README.md', 'hello, world!\n')
+}
 
-	fs.writeFileSync('/repo/README.md', 'Hello World\n');
-	console.log('file added: ', vol.toJSON())
+export const status = async (): Promise<string[]> => {
+	const status = await git.statusMatrix({ fs, dir: '/repo' })
+	return status.map(matrix => {
+		const fileName = matrix[0]
+		const head = matrix[1]
+		const status = matrix[2]
+		const staged = matrix[3]
+
+		return `${fileName}: `
+			+ `${head === 0 ? 'new' : 'present'}, `
+			+ `${status === 0 ? 'deleted' : status === 2 ? 'modified' : ''}, `
+			+ `${staged === 0 ? 'staged' : 'unstaged'}`
+	})
+
 }

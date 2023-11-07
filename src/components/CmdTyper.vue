@@ -44,8 +44,8 @@ const onInput = () => {
 
 const onkeydown = async (e: KeyboardEvent) => {
 	if (e.key === 'Enter') {
-		const result = processCommand(foreground.value)
-				?.process(rows.value);
+		const command = await processCommand(foreground.value)
+		const result = command?.process(rows.value);
 		if (result) {
 			rows.value = result;
 		}
